@@ -2,6 +2,7 @@
 
 #include "CandyGameMode.h"
 #include "CandyCharacter.h"
+#include "UI/SugerHUD.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACandyGameMode::ACandyGameMode()
@@ -12,4 +13,6 @@ ACandyGameMode::ACandyGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	HUDClass = ASugerHUD::StaticClass();
 }
