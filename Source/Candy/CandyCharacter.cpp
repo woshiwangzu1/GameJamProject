@@ -165,7 +165,7 @@ void ACandyCharacter::UpdateRagDoll()
 	TargetRagdollRotation = Rotator;
 
 	
-	UKismetSystemLibrary::LineTraceSingle(this,TargetRagdollLocation,);
+	// UKismetSystemLibrary::LineTraceSingle(this,TargetRagdollLocation,);
 }
 
 void ACandyCharacter::TurnAtRate(float Rate)
