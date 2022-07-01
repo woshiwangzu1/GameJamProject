@@ -97,5 +97,7 @@ protected:
 	FVector TargetRagdollLocation;
 	UPROPERTY(BlueprintReadWrite)
 	FRotator TargetRagdollRotation;
+	UPROPERTY(BlueprintReadWrite)
+	FRotator TargetRotation;
 };
 

@@ -164,8 +164,32 @@ void ACandyCharacter::UpdateRagDoll()
 	}
 	TargetRagdollRotation = Rotator;
 
-	
-	// UKismetSystemLibrary::LineTraceSingle(this,TargetRagdollLocation,);
+	FVector EndLocation;
+	EndLocation.X = TargetRagdollLocation.X;
+	EndLocation.Y = TargetRagdollLocation.Y;
+	EndLocation.Z = TargetRagdollLocation.Z-GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FHitResult HitResult;
+	TArray<AActor*> ActorsToIgnore;
+	UKismetSystemLibrary::LineTraceSingle(this,TargetRagdollLocation,EndLocation,
+		UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),false, ActorsToIgnore, EDrawDebugTrace::None,HitResult,true);
+
+	bRagdollOnGround = HitResult.bBlockingHit;
+	if (bRagdollOnGround)
+	{
+		FVector NewLocation;
+		TargetRotation = TargetRagdollRotation;
+		NewLocation.X = TargetRagdollLocation.X;
+		NewLocation.Y = TargetRagdollLocation.Y;
+		NewLocation.Z = TargetRagdollLocation.Z
+		+GetCapsuleComponent()->GetScaledCapsuleHalfHeight()
+		-UKismetMathLibrary::Abs(HitResult.ImpactPoint.Z-HitResult.TraceStart.Z)
+		+2;
+		SetActorLocationAndRotation(NewLocation,TargetRagdollRotation);
+		
+	}else
+	{
+		SetActorLocationAndRotation(TargetRagdollLocation,TargetRagdollRotation);
+	}
 }
 
 void ACandyCharacter::TurnAtRate(float Rate)
