@@ -28,7 +28,9 @@ public:
 
 	
 	bool IsGetHit();
-	
+
+	UFUNCTION(BlueprintCallable)
+	void GetHit();
 	
 protected:
 
@@ -81,8 +83,7 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	UAnimMontage* GetGetUpMontage(bool RagDollFaceUp);
-	UFUNCTION(BlueprintCallable)
-	void GetHit();
+	
 	UFUNCTION(Reliable,Server,WithValidation)
 	void Server_GetHit();
 	UFUNCTION(Reliable,NetMulticast,WithValidation)
@@ -94,7 +95,10 @@ protected:
 	void Server_GetUp();
 	UFUNCTION(Reliable,NetMulticast,WithValidation)
 	void Multi_GetUp();
+	
+	void Kick();
 
+	void Jump() override;
 	
 	virtual void Tick(float DeltaSeconds) override;
 	
@@ -133,6 +137,8 @@ protected:
 	UAnimMontage* HitDownMontage;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UAnimMontage* GetUpMontage;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UAnimMontage* AttackMontage;
 	UPROPERTY(EditAnywhere)
 	float HitDownTime;
 	UPROPERTY(Replicated)

@@ -125,6 +125,25 @@ bool ACandyCharacter::Multi_GetUp_Validate()
 	return true;
 }
 
+void ACandyCharacter::Kick()
+{
+	return;
+	if (bIsGetHit)
+	{
+		return;
+	}
+	PlayAnimMontage(AttackMontage);
+}
+
+void ACandyCharacter::Jump()
+{
+	if (bIsGetHit)
+	{
+		return;
+	}
+	Super::Jump();
+}
+
 void ACandyCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -178,7 +197,7 @@ void ACandyCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindTouch(IE_Released, this, &ACandyCharacter::TouchStopped);
 
 	// VR headset functionality
-	PlayerInputComponent->BindAction("ChangeRagDoll", IE_Pressed, this, &ACandyCharacter::ChangeRagDoll);
+	PlayerInputComponent->BindAction("Kick", IE_Pressed, this, &ACandyCharacter::Kick);
 
 	
 }
