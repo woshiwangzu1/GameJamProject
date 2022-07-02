@@ -19,13 +19,8 @@ void ASugerHUD::BeginPlay()
 		MainWidget = CreateWidget<UMainWidget>(GetOwningPlayerController(),MainWidgetclass);
 		
 		if (MainWidget)
-		{
-			if (MainWidget->IsInViewport())
-			{
-				
-			}
+		{			
 			MainWidget->AddToViewport();
-			UE_LOG(LogTemp,Log,TEXT("+++++++++++++"))
 		}
 	}
 	GetOwningPlayerController()->SetShowMouseCursor(true);

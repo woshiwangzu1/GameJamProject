@@ -14,4 +14,5 @@ class CANDY_API ASugerUIGameMode : public AGameMode
 {
 	GENERATED_BODY()
 	ASugerUIGameMode();
+	
 };

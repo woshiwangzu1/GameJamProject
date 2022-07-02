@@ -3,3 +3,11 @@
 
 #include "UI/Widget/LoginUserWidget.h"
 
+#include "Components/EditableTextBox.h"
+
+void ULoginUserWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	NameText = Name->GetText();
+}

@@ -9,9 +9,25 @@
 /**
  * 
  */
+
+class UEditableTextBox;
+
 UCLASS()
 class CANDY_API ULoginUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+
+	virtual void NativeOnInitialized() override;
+
+
+protected:
+
+	UPROPERTY(meta=(BindWidget))
+	UEditableTextBox* Name;
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	FText NameText;
 };
