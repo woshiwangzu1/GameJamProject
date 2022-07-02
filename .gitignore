@@ -2,6 +2,8 @@ Binaries
 DerivedDataCache
 Intermediate
 Saved
+/Content/AnimAssets
+/Content/EffectAssets
 .vscode
 .vs
 *.VC.db

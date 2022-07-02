@@ -20,23 +20,20 @@ class ACandyCharacter : public ACharacter
 
 	
 public:
-	ACandyCharacter();
+	ACandyCharacter(const FObjectInitializer& ObjectInitializer);
 
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	float BaseTurnRate;
-
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	float BaseLookUpRate;
+	
 
 	virtual void BeginPlay() override;
 
 	
+	bool IsGetHit();
+	
+	
 protected:
 
 	/** Resets HMD orientation in VR. */
-	void OnResetVR();
+	void ChangeRagDoll();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -64,14 +61,44 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void StartRagDoll();
-
+	UFUNCTION(Reliable,Server,WithValidation)
+	void Server_StartRagDoll();
+	UFUNCTION(Reliable,NetMulticast,WithValidation)
+	void Multi_StartRagDoll();
+	
 	UFUNCTION(BlueprintCallable)
 	void EndRagDoll();
+
+	UFUNCTION(Reliable,NetMulticast,WithValidation)
+	void Multi_EndRagDoll();
+
+	UFUNCTION(Reliable,Server,WithValidation)
+	void Server_EndRagDoll();
+	
 	UFUNCTION(BlueprintCallable)
 	void UpdateRagDoll();
+
+	
 	UFUNCTION(BlueprintImplementableEvent)
 	UAnimMontage* GetGetUpMontage(bool RagDollFaceUp);
+	UFUNCTION(BlueprintCallable)
+	void GetHit();
+	UFUNCTION(Reliable,Server,WithValidation)
+	void Server_GetHit();
+	UFUNCTION(Reliable,NetMulticast,WithValidation)
+	void Multi_GetHit();
+
+	UFUNCTION(BlueprintCallable)
+	void GetUp();
+	UFUNCTION(Reliable,Server,WithValidation)
+	void Server_GetUp();
+	UFUNCTION(Reliable,NetMulticast,WithValidation)
+	void Multi_GetUp();
+
 	
+	virtual void Tick(float DeltaSeconds) override;
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -83,8 +110,11 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 protected:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(Replicated,BlueprintReadWrite)
 	uint8 bIsRagDoll:1;
+	UPROPERTY(Replicated,BlueprintReadWrite)
+	uint8 bIsGetHit:1;
+	
 	UPROPERTY(BlueprintReadWrite)
 	UAnimInstance* MainAnimInstance;
 	UPROPERTY(BlueprintReadWrite)
@@ -93,11 +123,26 @@ protected:
 	uint8 bRagdollFaceUp:1;
 	UPROPERTY(BlueprintReadWrite)
 	FVector LastRagdollVelocity;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	FVector TargetRagdollLocation;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	FRotator TargetRagdollRotation;
 	UPROPERTY(BlueprintReadWrite)
 	FRotator TargetRotation;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UAnimMontage* HitDownMontage;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UAnimMontage* GetUpMontage;
+	UPROPERTY(EditAnywhere)
+	float HitDownTime;
+	UPROPERTY(Replicated)
+	float CurrentHitDownTime;
+	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	float BaseTurnRate;
+
+	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	float BaseLookUpRate;
 };
 
