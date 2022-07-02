@@ -22,6 +22,7 @@ AHoneycombActor::AHoneycombActor()
 	BoxColl0->SetBoxExtent(FVector(150,150,5));
 	BoxColl1->SetBoxExtent(FVector(149,149,4));
 	BoxColl2->SetBoxExtent(FVector(148,148,3));
+	bReplicates=true;
 }
 
 // Called when the game starts or when spawned

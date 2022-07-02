@@ -16,6 +16,7 @@ ARotateActor::ARotateActor()
 	RotatingMovement->RotationRate.Yaw=0;
 	NewType=EPropType::EPT_NONE;
 	NewState=EPropRotateState::EPR_NONE;
+	bReplicates=true;
 }
 
 // Called when the game starts or when spawned
