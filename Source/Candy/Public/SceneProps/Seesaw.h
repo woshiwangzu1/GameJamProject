@@ -28,9 +28,11 @@ protected:
 
 	void OnComponentEndOverlap(UPrimitiveComponent* OnComponentEndOverlap, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 protected:
+	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent*PlaneComp;
 	UPROPERTY(EditAnywhere)
 	UStaticMesh*Plane;
+	UPROPERTY(EditAnywhere)
 	UBoxComponent*BoxComponent;
 	UPROPERTY(EditAnywhere)
 	float ScaleX;

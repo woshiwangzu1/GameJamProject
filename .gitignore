@@ -14,3 +14,9 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
+.idea/.idea.Candy/.idea/.gitignore
+.idea/.idea.Candy/.idea/.name
+.idea/.idea.Candy/.idea/encodings.xml
+.idea/.idea.Candy/.idea/indexLayout.xml
+.idea/.idea.Candy/.idea/vcs.xml
+/Plugins/*

@@ -23,8 +23,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void UpdateBoxAnimation(float DeltaTime);
-
+	void UpdateBoxDownAnimation(float DeltaTime);
+	UFUNCTION()
+	void UpdateBoxUpAnimation(float DeltaTime);
+	
 	UFUNCTION()
 	void OnComponentBeginOverlapEvent
 	(UPrimitiveComponent* OverlappedComponent,
@@ -37,7 +39,14 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UCurveFloat* CurveAnimation;
 
-	float AnimationCurveTime;
+	float AnimationCurveTime0;
+	float AnimationCurveTime1;
+	UPROPERTY(EditAnywhere)
+	float DestroyTime;
+	UPROPERTY(EditAnywhere)
+	int32 LiftMM;
+
+	bool PlayAnim;
 	
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BoxColl0;
@@ -48,5 +57,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent*StaticMesh;
-	
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface*MaterialInterface;
 };
