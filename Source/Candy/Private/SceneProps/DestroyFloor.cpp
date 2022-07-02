@@ -14,7 +14,9 @@ ADestroyFloor::ADestroyFloor()
 	CurrentLocation=FVector2D(0,0);
 	NextLocation=FVector2D(0,0);
 	bCorrect=true;
-	
+	bChanged=false;
+	ReadyTime=5.0f;
+	Time=0.f;
 	RootComponent=CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	PlaneComp=CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneComp"));
 	PlaneComp->SetupAttachment(RootComponent);
@@ -68,13 +70,11 @@ void ADestroyFloor::OnComponentBeginOverlap(UPrimitiveComponent* OverlapedCompon
 	UE_LOG(LogTemp, Log, TEXT("====碰撞"));
 	if(ACandyCharacter*Player=Cast<ACandyCharacter>(OtherActor))
 	{
-		 
 		 if(!bCorrect)
 		 {
 		 	FTimerHandle Handle;
 		 	GetWorld()->GetTimerManager().SetTimer(Handle,this,&ADestroyFloor::DestroyFloor,0.5f);
 		 }
-		
 	}
 }
 
@@ -82,19 +82,29 @@ void ADestroyFloor::OnComponentBeginOverlap(UPrimitiveComponent* OverlapedCompon
 void ADestroyFloor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	Time+=DeltaTime;
+if(bCorrect&&Time<=ReadyTime&&!bChanged)
+{
+	PlaneComp->SetMaterial(0,MaterialInterface1);
+	bChanged=true;
+	FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(Handle,this,&ADestroyFloor::ReSet,5.f);
+}
+	 
 }
 
 void ADestroyFloor::SetIndex(FVector2D Index)
 {
-	
 	FloorIndex=Index;
-	 
 }
 
 void ADestroyFloor::DestroyFloor()
 {
-	 
 	Destroy();
+}
+
+void ADestroyFloor::ReSet()
+{
+	PlaneComp->SetMaterial(0,MaterialInterface2);
 }
 

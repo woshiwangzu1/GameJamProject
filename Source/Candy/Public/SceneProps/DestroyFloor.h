@@ -34,6 +34,14 @@ FVector2D NextLocation;
 FVector2D FloorIndex;
 	UPROPERTY(BlueprintReadWrite)
 	bool bCorrect;
+	bool bChanged;
+float ReadyTime;
+float Time;
+	
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface*MaterialInterface1;
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface*MaterialInterface2;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -41,4 +49,5 @@ public:
 void SetIndex(FVector2D Index);
 	void DestroyFloor();
 	TArray<FVector2D>CorrectPath;
+	void ReSet();
 };
