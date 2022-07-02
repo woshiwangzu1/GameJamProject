@@ -3,6 +3,7 @@
 #include "CandyCharacter.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Comp/BaseCharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -10,12 +11,14 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACandyCharacter
 
 
-ACandyCharacter::ACandyCharacter()
+ACandyCharacter::ACandyCharacter(const FObjectInitializer& ObjectInitializer)
+: Super(ObjectInitializer.SetDefaultSubobjectClass<UBaseCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -48,12 +51,109 @@ ACandyCharacter::ACandyCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	bRagdollOnGround = true;
+	HitDownTime = 2.f;
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Input
+
+
+void ACandyCharacter::GetHit()
+{
+	if (HasAuthority())
+	{
+		Multi_GetHit();
+	}else
+	{
+		Server_GetHit();
+	}
+}
+
+
+
+void ACandyCharacter::Server_GetHit_Implementation()
+{
+	Multi_GetHit();
+}
+
+bool ACandyCharacter::Server_GetHit_Validate()
+{
+	return true;
+}
+
+void ACandyCharacter::Multi_GetHit_Implementation()
+{
+	PlayAnimMontage(HitDownMontage);
+	bIsGetHit = true;
+	CurrentHitDownTime = HitDownTime;
+}
+
+bool ACandyCharacter::Multi_GetHit_Validate()
+{
+	return true;
+}
+
+void ACandyCharacter::GetUp()
+{
+	if (HasAuthority())
+	{
+		Multi_GetUp();
+	}else
+	{
+		Server_GetUp();
+	}
+}
+
+void ACandyCharacter::Server_GetUp_Implementation()
+{
+	Multi_GetUp();
+}
+
+bool ACandyCharacter::Server_GetUp_Validate()
+{
+	return true;
+}
+
+void ACandyCharacter::Multi_GetUp_Implementation()
+{
+	PlayAnimMontage(GetUpMontage);
+	bIsGetHit = false;
+}
+
+bool ACandyCharacter::Multi_GetUp_Validate()
+{
+	return true;
+}
+
+void ACandyCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (bIsGetHit)
+	{
+		CurrentHitDownTime-=DeltaSeconds;
+		if (CurrentHitDownTime<=0)
+		{
+			GetUp();
+			
+		}
+	}
+	
+}
+
+void ACandyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	// DOREPLIFETIME(ACandyCharacter,TargetRotation);
+	DOREPLIFETIME(ACandyCharacter,bIsRagDoll);
+	DOREPLIFETIME(ACandyCharacter,bIsGetHit);
+	DOREPLIFETIME(ACandyCharacter,CurrentHitDownTime);
+	// DOREPLIFETIME(ACandyCharacter,MainAnimInstance);
+	// DOREPLIFETIME(ACandyCharacter,bRagdollOnGround);
+	// DOREPLIFETIME(ACandyCharacter,bRagdollFaceUp);
+	// DOREPLIFETIME(ACandyCharacter,LastRagdollVelocity);
+	// DOREPLIFETIME(ACandyCharacter,TargetRagdollLocation);
+	// DOREPLIFETIME(ACandyCharacter,TargetRagdollRotation);
+}
 
 void ACandyCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -78,7 +178,9 @@ void ACandyCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindTouch(IE_Released, this, &ACandyCharacter::TouchStopped);
 
 	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ACandyCharacter::OnResetVR);
+	PlayerInputComponent->BindAction("ChangeRagDoll", IE_Pressed, this, &ACandyCharacter::ChangeRagDoll);
+
+	
 }
 
 
@@ -88,16 +190,23 @@ void ACandyCharacter::BeginPlay()
 	MainAnimInstance = GetMesh()->GetAnimInstance();
 }
 
-void ACandyCharacter::OnResetVR()
+bool ACandyCharacter::IsGetHit()
 {
-	// If Candy is added to a project via 'Add Feature' in the Unreal Editor the dependency on HeadMountedDisplay in Candy.Build.cs is not automatically propagated
-	// and a linker error will result.
-	// You will need to either:
-	//		Add "HeadMountedDisplay" to [YourProject].Build.cs PublicDependencyModuleNames in order to build successfully (appropriate if supporting VR).
-	// or:
-	//		Comment or delete the call to ResetOrientationAndPosition below (appropriate if not supporting VR)
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+	return bIsGetHit;
 }
+
+void ACandyCharacter::ChangeRagDoll()
+{
+	if (bIsRagDoll)
+	{
+		EndRagDoll();
+	}else
+	{
+		StartRagDoll();
+	}
+}
+
+
 
 void ACandyCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
@@ -111,6 +220,28 @@ void ACandyCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Locati
 
 void ACandyCharacter::StartRagDoll()
 {
+	if (HasAuthority())
+	{
+		Multi_StartRagDoll();
+	}else
+	{
+		Server_StartRagDoll();
+	}
+	
+}
+
+void ACandyCharacter::Server_StartRagDoll_Implementation()
+{
+	Multi_StartRagDoll();
+}
+
+bool ACandyCharacter::Server_StartRagDoll_Validate()
+{
+	return true;
+}
+
+void ACandyCharacter::Multi_StartRagDoll_Implementation()
+{
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -120,7 +251,23 @@ void ACandyCharacter::StartRagDoll()
 	bIsRagDoll = true;
 }
 
+bool ACandyCharacter::Multi_StartRagDoll_Validate()
+{
+	return true;
+}
+
 void ACandyCharacter::EndRagDoll()
+{
+	if (HasAuthority())
+	{
+		Multi_EndRagDoll();
+	}else
+	{
+		Server_EndRagDoll();
+	}
+}
+
+void ACandyCharacter::Multi_EndRagDoll_Implementation()
 {
 	MainAnimInstance->SavePoseSnapshot(TEXT("RagdollPose"));
 	if (bRagdollOnGround)
@@ -137,10 +284,32 @@ void ACandyCharacter::EndRagDoll()
 	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GetMesh()->SetAllBodiesSimulatePhysics(false);
+	bIsRagDoll = false;
+
+	UpdateRagDoll();
+}
+
+bool ACandyCharacter::Multi_EndRagDoll_Validate()
+{
+	return true;
+}
+
+void ACandyCharacter::Server_EndRagDoll_Implementation()
+{
+	Multi_EndRagDoll();
+}
+
+bool ACandyCharacter::Server_EndRagDoll_Validate()
+{
+	return true;
 }
 
 void ACandyCharacter::UpdateRagDoll()
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
 	LastRagdollVelocity = GetMesh()->GetPhysicsLinearVelocity(TEXT("J_Bip_C_Hips"));
 	float VectorLength = UKismetMathLibrary::VSize(LastRagdollVelocity);
 	float ClampedRange = UKismetMathLibrary::MapRangeClamped(VectorLength,0,1000,0,25000);
@@ -206,6 +375,11 @@ void ACandyCharacter::LookUpAtRate(float Rate)
 
 void ACandyCharacter::MoveForward(float Value)
 {
+	if (bIsGetHit)
+	{
+		return;
+	}
+	
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		// find out which way is forward
@@ -220,6 +394,10 @@ void ACandyCharacter::MoveForward(float Value)
 
 void ACandyCharacter::MoveRight(float Value)
 {
+	if (bIsGetHit)
+	{
+		return;
+	}
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		// find out which way is right
