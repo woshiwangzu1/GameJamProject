@@ -10,6 +10,9 @@
  * 
  */
 class ULoginUserWidget;
+class URoomListUserWidget;
+class UMainWidget;
+
 UCLASS()
 class CANDY_API ASugerHUD : public AHUD
 {
@@ -22,10 +25,18 @@ public:
 public:
 	UFUNCTION()
 	void ShowLogin();
+	
+	UFUNCTION(BlueprintCallable)
+	void ShowRoomListUI();
+	
 
 
 protected:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	ULoginUserWidget* LoginUserWidget;
+	UPROPERTY(BlueprintReadOnly)
+	UMainWidget* MainWidget;
+	UPROPERTY(BlueprintReadOnly)
+	URoomListUserWidget* RoomListUserWidget;
 	
 };

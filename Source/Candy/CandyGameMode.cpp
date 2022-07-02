@@ -14,5 +14,4 @@ ACandyGameMode::ACandyGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	HUDClass = ASugerHUD::StaticClass();
 }
