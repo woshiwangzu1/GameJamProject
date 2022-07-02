@@ -28,7 +28,7 @@ void ASugerHUD::BeginPlay()
 			UE_LOG(LogTemp,Log,TEXT("+++++++++++++"))
 		}
 	}
-	//GetOwningPlayerController()->SetShowMouseCursor(true);
+	GetOwningPlayerController()->SetShowMouseCursor(true);
 }
 
 void ASugerHUD::ShowLogin()
