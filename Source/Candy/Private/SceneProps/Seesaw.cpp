@@ -13,8 +13,7 @@ ASeesaw::ASeesaw()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-ScaleX=10.0f;
-ScaleY=2.0f;
+ 
 	RotatSpeed=5000;
 	RootComponent=CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	PlaneComp=CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneComp"));
@@ -31,9 +30,7 @@ ScaleY=2.0f;
 void ASeesaw::BeginPlay()
 {
 	Super::BeginPlay();
-	ScaleX=FMath::RandRange(6,15);
-	ScaleY=FMath::RandRange(0.8,2);
-	PlaneComp->SetWorldScale3D(FVector(ScaleX,ScaleY,0.3));
+	 
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this,&ASeesaw::OnComponentBeginOverlap);
 	BoxComponent->OnComponentEndOverlap.AddDynamic(this,&ASeesaw::OnComponentEndOverlap);
 }
@@ -67,10 +64,14 @@ void ASeesaw::OnComponentEndOverlap(UPrimitiveComponent* OnComponentEndOverlap, 
 void ASeesaw::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-if(Players.Num()>0)
+	if(Players.Num()>0)
 {
 	SeesawRotat();
 }
+else
+	{
+		SetActorRotation(FRotator(0,FMath::FInterpTo(0,GetActorRotation().Pitch,DeltaTime,1.2),0));
+	}
 }
 
 void ASeesaw::SeesawRotat()
@@ -78,8 +79,13 @@ void ASeesaw::SeesawRotat()
 	for(auto P:Players)
 	{
 		float Distance=GetActorLocation().X-P->GetActorLocation().X;
-		SetActorRotation(FRotator(0,Distance/RotatSpeed,0));
-		P->AddActorWorldOffset(FVector(GetActorRotation().Pitch*(-0.3),0,0));
+		if(P->GetActorLocation().Z>GetActorLocation().Z)
+		{
+			AddActorWorldRotation(FRotator(Distance/RotatSpeed,0,0));
+			
+			P->AddActorWorldOffset(FVector(GetActorRotation().Pitch*(-0.03),0,0));
+		}
+		 
 	}
 }
 

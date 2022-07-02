@@ -24,8 +24,9 @@ protected:
 	UFUNCTION()
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
 								 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-								 const FHitResult& SweppResult);
 
+								 const FHitResult& SweppResult);
+	UFUNCTION()
 	void OnComponentEndOverlap(UPrimitiveComponent* OnComponentEndOverlap, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 protected:
 	UPROPERTY(EditAnywhere)
@@ -34,10 +35,8 @@ protected:
 	UStaticMesh*Plane;
 	UPROPERTY(EditAnywhere)
 	UBoxComponent*BoxComponent;
-	UPROPERTY(EditAnywhere)
-	float ScaleX;
-	UPROPERTY(EditAnywhere)
-	float ScaleY;
+
+	
 	UPROPERTY(EditAnywhere)
 	int32 RotatSpeed;
 	TArray<ACandyCharacter*>Players;
