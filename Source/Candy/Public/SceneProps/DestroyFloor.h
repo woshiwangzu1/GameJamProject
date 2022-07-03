@@ -37,7 +37,12 @@ FVector2D FloorIndex;
 	bool bChanged;
 float ReadyTime;
 float Time;
-	
+ 
+	//网络相关
+	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	// UFUNCTION(Server, Reliable, WithValidation)
+	// void Server_ChangeColor(bool bCorrect);
+ void Appear();
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface*MaterialInterface1;
 	UPROPERTY(EditAnywhere)

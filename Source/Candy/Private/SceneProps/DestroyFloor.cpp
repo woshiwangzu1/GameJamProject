@@ -4,6 +4,7 @@
 #include "SceneProps/DestroyFloor.h"
 #include "Candy/CandyCharacter.h"
 #include "Components/BoxComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ADestroyFloor::ADestroyFloor()
@@ -73,10 +74,25 @@ void ADestroyFloor::OnComponentBeginOverlap(UPrimitiveComponent* OverlapedCompon
 		 if(!bCorrect)
 		 {
 		 	FTimerHandle Handle;
-		 	GetWorld()->GetTimerManager().SetTimer(Handle,this,&ADestroyFloor::DestroyFloor,0.5f);
+		 	GetWorld()->GetTimerManager().SetTimer(Handle,this,&ADestroyFloor::DestroyFloor,0.1f);
 		 }
 	}
 }
+
+// void ADestroyFloor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+// {
+// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+// 	DOREPLIFETIME(ADestroyFloor, bCorrect);
+// }
+
+// void ADestroyFloor::Server_ChangeColor_Implementation(bool bCorrect)
+// {
+// }
+//
+// bool ADestroyFloor::Server_ChangeColor_Validate(bool bCorrect)
+// {
+// }
+
 
 // Called every frame
 void ADestroyFloor::Tick(float DeltaTime)
@@ -85,14 +101,21 @@ void ADestroyFloor::Tick(float DeltaTime)
 	Time+=DeltaTime;
 if(bCorrect&&Time<=ReadyTime&&!bChanged)
 {
+	Appear();
+}
+}
+
+void ADestroyFloor::Appear()
+{
+	// if (!HasAuthority())
+	// {
+	// 	Server_ChangeColor_Validate();
+	// }
 	PlaneComp->SetMaterial(0,MaterialInterface1);
 	bChanged=true;
 	FTimerHandle Handle;
 	GetWorld()->GetTimerManager().SetTimer(Handle,this,&ADestroyFloor::ReSet,5.f);
 }
-	 
-}
-
 void ADestroyFloor::SetIndex(FVector2D Index)
 {
 	FloorIndex=Index;

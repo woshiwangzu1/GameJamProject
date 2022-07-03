@@ -6,6 +6,8 @@
 
 #include "SceneProps/Seesaw.h"
 
+#include <ThirdParty/openexr/Deploy/OpenEXR-2.3.0/OpenEXR/include/ImathFun.h>
+
 #include "Candy/CandyCharacter.h"
 
 // Sets default values
@@ -33,6 +35,7 @@ void ASeesaw::BeginPlay()
 	 
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this,&ASeesaw::OnComponentBeginOverlap);
 	BoxComponent->OnComponentEndOverlap.AddDynamic(this,&ASeesaw::OnComponentEndOverlap);
+	PlaneComp->SetMaterial(0,MaterialInterface1);
 }
 
 void ASeesaw::OnComponentBeginOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
@@ -70,7 +73,7 @@ void ASeesaw::Tick(float DeltaTime)
 }
 else
 	{
-		SetActorRotation(FRotator(0,FMath::FInterpTo(0,GetActorRotation().Pitch,DeltaTime,1.2),0));
+	Reset();
 	}
 }
 
@@ -79,12 +82,10 @@ void ASeesaw::SeesawRotat()
 	for(auto P:Players)
 	{
 		float Distance=GetActorLocation().X-P->GetActorLocation().X;
-		if(P->GetActorLocation().Z>GetActorLocation().Z)
-		{
+		 
 			AddActorWorldRotation(FRotator(Distance/RotatSpeed,0,0));
 			
 			P->AddActorWorldOffset(FVector(GetActorRotation().Pitch*(-0.03),0,0));
-		}
 		 
 	}
 }

@@ -35,7 +35,8 @@ protected:
 	UStaticMesh*Plane;
 	UPROPERTY(EditAnywhere)
 	UBoxComponent*BoxComponent;
-
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface*MaterialInterface1;
 	
 	UPROPERTY(EditAnywhere)
 	int32 RotatSpeed;
@@ -44,4 +45,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void SeesawRotat();
+	UFUNCTION(BlueprintImplementableEvent)
+	void Reset();
 };
